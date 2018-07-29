@@ -18,7 +18,7 @@ npm i xerxes-react-carousel or yarn add xerxes-react-carousel
 ### props说明
 
 | Attributes | Type | Default | value | Description |
-| ---------- | ------ | --------- | ------------ |
+| :---------- | :--: | :---------: | :------------ |
 | initIndex  | Number |    ❌   | --     | 初始化时指向的carouselItem 的下标，默认从0开始 |
 | autoplay   | Boolean | false  | true || false  | 是否自动播放 |
 | type       | String  |   ❌   |  card | 轮播图的类型 |
