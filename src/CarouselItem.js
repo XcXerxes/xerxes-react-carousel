@@ -17,7 +17,7 @@ class CarouselItem extends Component {
     if (contextComponent.iscard) {
       const index = contextComponent.state.items.indexOf(this)
       console.log(index)
-      contextComponent.setActiveItem(index)
+      contextComponent.throttleArrowClick(index)
     }
   }
   componentWillMount () {

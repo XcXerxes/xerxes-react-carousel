@@ -1,13 +1,21 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import {throttle} from 'throttle-debounce'
 import {addResizeListener, removeResizeListener} from './utils/resize-event'
 
 class Carousel extends Component {
-  state = {
-    items: [],
-    activeIndex: -1,
-    hover: false
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      items: [],
+      activeIndex: -1,
+      hover: false
+    }
+    this.throttleArrowClick = throttle(300, true, index => {
+      this.setActiveItem(index)
+    })
   }
   get iscard () {
     const {type} = this.props
@@ -121,10 +129,10 @@ class Carousel extends Component {
     // this.startTime()
   }
   next = () => {
-    this.setActiveItem(this.state.activeIndex + 1)
+    this.throttleArrowClick(this.state.activeIndex + 1)
   }
   prev = () => {
-    this.setActiveItem(this.state.activeIndex - 1)
+    this.throttleArrowClick(this.state.activeIndex - 1)
   }
   render() {
     const {

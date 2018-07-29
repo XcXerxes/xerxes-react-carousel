@@ -20363,6 +20363,327 @@ var define;
 	}
 }());
 
+},{}],"../node_modules/throttle-debounce/index.esm.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+/* eslint-disable no-undefined,no-param-reassign,no-shadow */
+
+/**
+ * Throttle execution of a function. Especially useful for rate limiting
+ * execution of handlers on events like resize and scroll.
+ *
+ * @param  {Number}    delay          A zero-or-greater delay in milliseconds. For event callbacks, values around 100 or 250 (or even higher) are most useful.
+ * @param  {Boolean}   [noTrailing]   Optional, defaults to false. If noTrailing is true, callback will only execute every `delay` milliseconds while the
+ *                                    throttled-function is being called. If noTrailing is false or unspecified, callback will be executed one final time
+ *                                    after the last throttled-function call. (After the throttled-function has not been called for `delay` milliseconds,
+ *                                    the internal counter is reset)
+ * @param  {Function}  callback       A function to be executed after delay milliseconds. The `this` context and all arguments are passed through, as-is,
+ *                                    to `callback` when the throttled-function is executed.
+ * @param  {Boolean}   [debounceMode] If `debounceMode` is true (at begin), schedule `clear` to execute after `delay` ms. If `debounceMode` is false (at end),
+ *                                    schedule `callback` to execute after `delay` ms.
+ *
+ * @return {Function}  A new, throttled, function.
+ */
+function throttle(delay, noTrailing, callback, debounceMode) {
+
+	/*
+  * After wrapper has stopped being called, this timeout ensures that
+  * `callback` is executed at the proper times in `throttle` and `end`
+  * debounce modes.
+  */
+	var timeoutID;
+
+	// Keep track of the last time `callback` was executed.
+	var lastExec = 0;
+
+	// `noTrailing` defaults to falsy.
+	if (typeof noTrailing !== 'boolean') {
+		debounceMode = callback;
+		callback = noTrailing;
+		noTrailing = undefined;
+	}
+
+	/*
+  * The `wrapper` function encapsulates all of the throttling / debouncing
+  * functionality and when executed will limit the rate at which `callback`
+  * is executed.
+  */
+	function wrapper() {
+
+		var self = this;
+		var elapsed = Number(new Date()) - lastExec;
+		var args = arguments;
+
+		// Execute `callback` and update the `lastExec` timestamp.
+		function exec() {
+			lastExec = Number(new Date());
+			callback.apply(self, args);
+		}
+
+		/*
+   * If `debounceMode` is true (at begin) this is used to clear the flag
+   * to allow future `callback` executions.
+   */
+		function clear() {
+			timeoutID = undefined;
+		}
+
+		if (debounceMode && !timeoutID) {
+			/*
+    * Since `wrapper` is being called for the first time and
+    * `debounceMode` is true (at begin), execute `callback`.
+    */
+			exec();
+		}
+
+		// Clear any existing timeout.
+		if (timeoutID) {
+			clearTimeout(timeoutID);
+		}
+
+		if (debounceMode === undefined && elapsed > delay) {
+			/*
+    * In throttle mode, if `delay` time has been exceeded, execute
+    * `callback`.
+    */
+			exec();
+		} else if (noTrailing !== true) {
+			/*
+    * In trailing throttle mode, since `delay` time has not been
+    * exceeded, schedule `callback` to execute `delay` ms after most
+    * recent execution.
+    *
+    * If `debounceMode` is true (at begin), schedule `clear` to execute
+    * after `delay` ms.
+    *
+    * If `debounceMode` is false (at end), schedule `callback` to
+    * execute after `delay` ms.
+    */
+			timeoutID = setTimeout(debounceMode ? clear : exec, debounceMode === undefined ? delay - elapsed : delay);
+		}
+	}
+
+	// Return the wrapper function.
+	return wrapper;
+}
+
+/* eslint-disable no-undefined */
+
+/**
+ * Debounce execution of a function. Debouncing, unlike throttling,
+ * guarantees that a function is only executed a single time, either at the
+ * very beginning of a series of calls, or at the very end.
+ *
+ * @param  {Number}   delay         A zero-or-greater delay in milliseconds. For event callbacks, values around 100 or 250 (or even higher) are most useful.
+ * @param  {Boolean}  [atBegin]     Optional, defaults to false. If atBegin is false or unspecified, callback will only be executed `delay` milliseconds
+ *                                  after the last debounced-function call. If atBegin is true, callback will be executed only at the first debounced-function call.
+ *                                  (After the throttled-function has not been called for `delay` milliseconds, the internal counter is reset).
+ * @param  {Function} callback      A function to be executed after delay milliseconds. The `this` context and all arguments are passed through, as-is,
+ *                                  to `callback` when the debounced-function is executed.
+ *
+ * @return {Function} A new, debounced function.
+ */
+function debounce(delay, atBegin, callback) {
+	return callback === undefined ? throttle(delay, atBegin, false) : throttle(delay, callback, atBegin !== false);
+}
+
+exports.throttle = throttle;
+exports.debounce = debounce;
+},{}],"../src/utils/resize-event.js":[function(require,module,exports) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* Modified from https://github.com/sdecima/javascript-detect-element-resize
+ * version: 0.5.3
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2013 Sebastián Décima
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+var isServer = typeof window === 'undefined';
+
+/* istanbul ignore next */
+var requestFrame = function () {
+  if (isServer) return;
+  var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || function (fn) {
+    return window.setTimeout(fn, 20);
+  };
+  return function (fn) {
+    return raf(fn);
+  };
+}();
+
+/* istanbul ignore next */
+var cancelFrame = function () {
+  if (isServer) return;
+  var cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame || window.clearTimeout;
+  return function (id) {
+    return cancel(id);
+  };
+}();
+
+/* istanbul ignore next */
+var resetTrigger = function resetTrigger(element) {
+  var trigger = element.__resizeTrigger__;
+  var expand = trigger.firstElementChild;
+  var contract = trigger.lastElementChild;
+  var expandChild = expand.firstElementChild;
+
+  contract.scrollLeft = contract.scrollWidth;
+  contract.scrollTop = contract.scrollHeight;
+  expandChild.style.width = expand.offsetWidth + 1 + 'px';
+  expandChild.style.height = expand.offsetHeight + 1 + 'px';
+  expand.scrollLeft = expand.scrollWidth;
+  expand.scrollTop = expand.scrollHeight;
+};
+
+/* istanbul ignore next */
+var checkTriggers = function checkTriggers(element) {
+  return element.offsetWidth !== element.__resizeLast__.width || element.offsetHeight !== element.__resizeLast__.height;
+};
+
+/* istanbul ignore next */
+var scrollListener = function scrollListener(event) {
+  var _this = this;
+
+  resetTrigger(this);
+  if (this.__resizeRAF__) cancelFrame(this.__resizeRAF__);
+  this.__resizeRAF__ = requestFrame(function () {
+    if (checkTriggers(_this)) {
+      _this.__resizeLast__.width = _this.offsetWidth;
+      _this.__resizeLast__.height = _this.offsetHeight;
+      _this.__resizeListeners__.forEach(function (fn) {
+        fn.call(_this, event);
+      });
+    }
+  });
+};
+
+/* Detect CSS Animations support to detect element display/re-attach */
+var attachEvent = isServer ? {} : document.attachEvent;
+var DOM_PREFIXES = 'Webkit Moz O ms'.split(' ');
+var START_EVENTS = 'webkitAnimationStart animationstart oAnimationStart MSAnimationStart'.split(' ');
+var RESIZE_ANIMATION_NAME = 'resizeanim';
+var animation = false;
+var keyFramePrefix = '';
+var animationStartEvent = 'animationstart';
+
+/* istanbul ignore next */
+if (!attachEvent && !isServer) {
+  var testElement = document.createElement('fakeelement');
+  if (testElement.style.animationName !== undefined) {
+    animation = true;
+  }
+
+  if (animation === false) {
+    var prefix = '';
+    for (var i = 0; i < DOM_PREFIXES.length; i++) {
+      if (testElement.style[DOM_PREFIXES[i] + 'AnimationName'] !== undefined) {
+        prefix = DOM_PREFIXES[i];
+        keyFramePrefix = '-' + prefix.toLowerCase() + '-';
+        animationStartEvent = START_EVENTS[i];
+        animation = true;
+        break;
+      }
+    }
+  }
+}
+
+var stylesCreated = false;
+/* istanbul ignore next */
+var createStyles = function createStyles() {
+  if (!stylesCreated && !isServer) {
+    var animationKeyframes = '@' + keyFramePrefix + 'keyframes ' + RESIZE_ANIMATION_NAME + ' { from { opacity: 0; } to { opacity: 0; } } ';
+    var animationStyle = keyFramePrefix + 'animation: 1ms ' + RESIZE_ANIMATION_NAME + ';';
+
+    // opacity: 0 works around a chrome bug https://code.google.com/p/chromium/issues/detail?id=286360
+    var css = animationKeyframes + '\n      .resize-triggers { ' + animationStyle + ' visibility: hidden; opacity: 0; }\n      .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: " "; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; }\n      .resize-triggers > div { background: #eee; overflow: auto; }\n      .contract-trigger:before { width: 200%; height: 200%; }';
+
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+
+    style.type = 'text/css';
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+
+    head.appendChild(style);
+    stylesCreated = true;
+  }
+};
+
+/* istanbul ignore next */
+var addResizeListener = exports.addResizeListener = function addResizeListener(element, fn) {
+  if (isServer) return;
+  if (attachEvent) {
+    element.attachEvent('onresize', fn);
+  } else {
+    if (!element.__resizeTrigger__) {
+      if (getComputedStyle(element).position === 'static') {
+        element.style.position = 'relative';
+      }
+      createStyles();
+      element.__resizeLast__ = {};
+      element.__resizeListeners__ = [];
+
+      var resizeTrigger = element.__resizeTrigger__ = document.createElement('div');
+      resizeTrigger.className = 'resize-triggers';
+      resizeTrigger.innerHTML = '<div class="expand-trigger"><div></div></div><div class="contract-trigger"></div>';
+      element.appendChild(resizeTrigger);
+
+      resetTrigger(element);
+      element.addEventListener('scroll', scrollListener, true);
+
+      /* Listen for a css animation to detect element display/re-attach */
+      if (animationStartEvent) {
+        resizeTrigger.addEventListener(animationStartEvent, function (event) {
+          if (event.animationName === RESIZE_ANIMATION_NAME) {
+            resetTrigger(element);
+          }
+        });
+      }
+    }
+    element.__resizeListeners__.push(fn);
+  }
+};
+
+/* istanbul ignore next */
+var removeResizeListener = exports.removeResizeListener = function removeResizeListener(element, fn) {
+  if (attachEvent) {
+    element.detachEvent('onresize', fn);
+  } else {
+    element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
+    if (!element.__resizeListeners__.length) {
+      element.removeEventListener('scroll', scrollListener);
+      element.__resizeTrigger__ = !element.removeChild(element.__resizeTrigger__);
+    }
+  }
+};
 },{}],"../src/Carousel.js":[function(require,module,exports) {
 'use strict';
 
@@ -20385,6 +20706,10 @@ var _classnames = require('classnames');
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
+var _throttleDebounce = require('throttle-debounce');
+
+var _resizeEvent = require('./utils/resize-event');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20396,26 +20721,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Carousel = function (_Component) {
   _inherits(Carousel, _Component);
 
-  function Carousel() {
-    var _ref;
-
-    var _temp, _this, _ret;
-
+  function Carousel(props) {
     _classCallCheck(this, Carousel);
 
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
+    var _this = _possibleConstructorReturn(this, (Carousel.__proto__ || Object.getPrototypeOf(Carousel)).call(this, props));
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Carousel.__proto__ || Object.getPrototypeOf(Carousel)).call.apply(_ref, [this].concat(args))), _this), Object.defineProperty(_this, 'state', {
+    Object.defineProperty(_this, 'resetItemPosition', {
       enumerable: true,
       writable: true,
-      value: {
-        items: [],
-        activeIndex: -1,
-        hover: false
+      value: function value(oldIndex) {
+        _this.state.items.forEach(function (item, index) {
+          item.translateItem(index, _this.state.activeIndex, oldIndex);
+        });
       }
-    }), Object.defineProperty(_this, 'startTime', {
+    });
+    Object.defineProperty(_this, 'startTime', {
       enumerable: true,
       writable: true,
       value: function value() {
@@ -20426,7 +20746,8 @@ var Carousel = function (_Component) {
         if (interval <= 0 || !autoplay) return;
         _this.timer = setInterval(_this.playSlides(Number(interval)));
       }
-    }), Object.defineProperty(_this, 'playSlides', {
+    });
+    Object.defineProperty(_this, 'playSlides', {
       enumerable: true,
       writable: true,
       value: function value() {
@@ -20441,28 +20762,56 @@ var Carousel = function (_Component) {
         }
         _this.setState({ activeIndex: activeIndex });
       }
-    }), Object.defineProperty(_this, 'pauseTimer', {
+    });
+    Object.defineProperty(_this, 'pauseTimer', {
       enumerable: true,
       writable: true,
       value: function value() {
         clearInterval(_this.timer);
         _this.timer = null;
       }
-    }), Object.defineProperty(_this, '_handleMouseEnter', {
+    });
+    Object.defineProperty(_this, '_handleMouseEnter', {
       enumerable: true,
       writable: true,
       value: function value() {
         _this.setState({ hover: true });
-        _this.pauseTimer();
+        // this.pauseTimer()
       }
-    }), Object.defineProperty(_this, '_handleMouseLeave', {
+    });
+    Object.defineProperty(_this, '_handleMouseLeave', {
       enumerable: true,
       writable: true,
       value: function value() {
         _this.setState({ hover: false });
-        _this.startTime();
+        // this.startTime()
       }
-    }), _temp), _possibleConstructorReturn(_this, _ret);
+    });
+    Object.defineProperty(_this, 'next', {
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        _this.throttleArrowClick(_this.state.activeIndex + 1);
+      }
+    });
+    Object.defineProperty(_this, 'prev', {
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        _this.throttleArrowClick(_this.state.activeIndex - 1);
+      }
+    });
+
+
+    _this.state = {
+      items: [],
+      activeIndex: -1,
+      hover: false
+    };
+    _this.throttleArrowClick = (0, _throttleDebounce.throttle)(300, true, function (index) {
+      _this.setActiveItem(index);
+    });
+    return _this;
   }
 
   _createClass(Carousel, [{
@@ -20472,10 +20821,67 @@ var Carousel = function (_Component) {
         component: this
       };
     }
+
+    /**
+     * 
+     * @param {*选择的下标} index 
+     */
+
+  }, {
+    key: 'setActiveItem',
+    value: function setActiveItem(index) {
+      debugger;
+      var activeIndex = this.state.activeIndex;
+
+      index = Number(index);
+
+      if (isNaN(index) || index !== Math.floor(index)) {
+        'development' !== 'production' && console.warn('[Carousel] index must be an int');
+        return;
+      }
+      var length = this.state.items.length;
+
+      if (index < 0) {
+        activeIndex = length - 1;
+      } else if (index >= length) {
+        activeIndex = 0;
+      } else {
+        activeIndex = index;
+      }
+      this.setState({ activeIndex: activeIndex });
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var initIndex = this.props.initIndex;
+      var items = this.state.items;
+
+      if (initIndex < items.length && initIndex >= 0) {
+        this.setState({
+          activeIndex: initIndex
+        });
+      } else {
+        this.setState({ activeIndex: 0 });
+      }
+    }
   }, {
     key: 'componentDidUpdate',
-    value: function componentDidUpdate() {
-      console.log('update');
+    value: function componentDidUpdate(prevProps, prevState) {
+      (0, _resizeEvent.addResizeListener)(this.refs.root, this.resetItemPosition);
+
+      if (prevState.activeIndex !== this.state.activeIndex) {
+        this.resetItemPosition(prevState.activeIndex);
+        if (this.props.onChange) {
+          this.props.onChange(this.state.activeIndex, prevState.activeIndex);
+        }
+      }
+    }
+    // 充值元素的位置
+
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      removeEventListener(this.refs.root, this.resetItemPosition);
     }
     /**
      * 
@@ -20518,19 +20924,40 @@ var Carousel = function (_Component) {
           }),
           onMouseEnter: this._handleMouseEnter,
           onMouseLeave: this._handleMouseLeave,
+          ref: 'root',
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 75
+            lineNumber: 142
           },
           __self: this
         },
+        _react2.default.createElement(
+          'div',
+          { onClick: this.next, __source: {
+              fileName: _jsxFileName,
+              lineNumber: 149
+            },
+            __self: this
+          },
+          'Next'
+        ),
+        _react2.default.createElement(
+          'div',
+          { onClick: this.prev, __source: {
+              fileName: _jsxFileName,
+              lineNumber: 150
+            },
+            __self: this
+          },
+          'Prev'
+        ),
         _react2.default.createElement(
           'div',
           { className: 'xerxes-carousel__container',
             style: { height: height + 'px' },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 81
+              lineNumber: 151
             },
             __self: this
           },
@@ -20572,7 +20999,7 @@ Carousel.propTypes = {
 };
 
 exports.default = Carousel;
-},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","classnames":"../node_modules/classnames/index.js"}],"../src/CarouselItem.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","classnames":"../node_modules/classnames/index.js","throttle-debounce":"../node_modules/throttle-debounce/index.esm.js","./utils/resize-event":"../src/utils/resize-event.js"}],"../src/CarouselItem.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20585,6 +21012,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
 
 var _propTypes = require('prop-types');
 
@@ -20622,7 +21053,10 @@ var CarouselItem = function (_Component) {
       value: {
         active: false,
         inStage: false,
-        animating: false
+        animating: false,
+        translate: 0,
+        scale: 1,
+        ready: false
       }
     }), Object.defineProperty(_this, '_handleItemClick', {
       enumerable: true,
@@ -20632,7 +21066,7 @@ var CarouselItem = function (_Component) {
         if (contextComponent.iscard) {
           var index = contextComponent.state.items.indexOf(_this);
           console.log(index);
-          // contextComponent.setActiveItem(index)
+          contextComponent.throttleArrowClick(index);
         }
       }
     }), _temp), _possibleConstructorReturn(_this, _ret);
@@ -20649,18 +21083,101 @@ var CarouselItem = function (_Component) {
       this.context.component.removeItem(this);
     }
   }, {
+    key: 'processIndex',
+
+
+    /**
+     * 
+     * @param {*} index
+     * @param {*} activeIndex
+     * @param {*个数} length
+     */
+    value: function processIndex(index, activeIndex, length) {
+      if (activeIndex === 0 && index === length - 1) {
+        return -1;
+      } else if (activeIndex === length - 1 && index === 0) {
+        return length;
+      } else if (index < activeIndex - 1 && activeIndex - index >= length / 2) {
+        return length + 1;
+      } else if (index > activeIndex + 1 && index - activeIndex >= length / 2) {
+        return -2;
+      }
+      return index;
+    }
+  }, {
+    key: 'calculateTranslate',
+    value: function calculateTranslate(index, activeIndex, parentWidth) {
+      if (this.state.inStage) {
+        return parentWidth * ((2 - this.CARD_SCALE) * (index - activeIndex) + 1) / 4;
+      } else if (index < activeIndex) {
+        return -(1 + this.CARD_SCALE) * parentWidth / 4;
+      } else {
+        return (4 - 1 + this.CARD_SCALE) * parentWidth / 4;
+      }
+    }
+
+    /**
+     * 
+     * @param {*component默认的} index 
+     * @param {*当前的component} activeIndex 
+     * @param {*上一个component} oldIndex 
+     */
+
+  }, {
+    key: 'translateItem',
+    value: function translateItem(index, activeIndex, oldIndex) {
+      debugger;
+      var component = this.context.component;
+      // 获取父元素的dom节点
+
+      var parent = _reactDom2.default.findDOMNode(this.context.component);
+      // 获取偏移width
+      var parentWidth = parent.offsetWidth;
+      // slide的个数
+      var length = component.state.items.length;
+
+
+      if (!component.iscard && oldIndex !== undefined) {
+        this.state.animating = index === activeIndex || index === oldIndex;
+      }
+
+      if (index !== activeIndex && length > 2) {
+        index = this.processIndex(index, activeIndex, length);
+      }
+
+      if (component.iscard) {
+        // 当前元素index， 前一个元素， 后一个元素
+        this.state.inStage = Math.round(Math.abs(index - activeIndex)) <= 1;
+        this.state.active = index === activeIndex;
+        this.state.translate = this.calculateTranslate(index, activeIndex, parentWidth);
+        console.log('translate ===================');
+        console.log(this.state.translate);
+        console.log('translate ===================');
+        this.state.scale = this.state.active ? 1 : this.CARD_SCALE;
+      } else {
+        this.state.active = index === activeIndex;
+        this.state.translate = parentWidth * (index - activeIndex);
+      }
+      this.state.ready = true;
+      this.forceUpdate();
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _state = this.state,
           active = _state.active,
           inStage = _state.inStage,
-          animating = _state.animating;
+          animating = _state.animating,
+          translate = _state.translate,
+          scale = _state.scale,
+          ready = _state.ready;
+      var iscard = this.context.component.iscard;
 
-      return _react2.default.createElement(
+      return ready && _react2.default.createElement(
         'div',
         { className: (0, _classnames2.default)('xerxes-carousel__item', {
             'is-active': active,
-            'xerxes-carousel__item-card': this.context.component.iscard,
+            'xerxes-carousel__item-card': iscard,
             'is-in-stage': inStage,
             'is-animating': animating
           }),
@@ -20670,20 +21187,25 @@ var CarouselItem = function (_Component) {
           },
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 28
+            lineNumber: 107
           },
           __self: this
         },
-        this.context.component.iscard && _react2.default.createElement('div', { show: !active,
+        iscard && !active && _react2.default.createElement('div', {
           className: 'xerxes-carousel__mask',
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 41
+            lineNumber: 120
           },
           __self: this
         }),
         this.props.children
       );
+    }
+  }, {
+    key: 'CARD_SCALE',
+    get: function get() {
+      return .83;
     }
   }]);
 
@@ -20696,7 +21218,7 @@ CarouselItem.contextTypes = {
 };
 
 exports.default = CarouselItem;
-},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","classnames":"../node_modules/classnames/index.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","prop-types":"../node_modules/prop-types/index.js","classnames":"../node_modules/classnames/index.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -20784,11 +21306,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _Carousel2.default.Item = _CarouselItem2.default;
 
 exports.default = _Carousel2.default;
-},{"./Carousel":"../src/Carousel.js","./CarouselItem":"../src/CarouselItem.js","./index.css":"../src/index.css"}],"index.js":[function(require,module,exports) {
+},{"./Carousel":"../src/Carousel.js","./CarouselItem":"../src/CarouselItem.js","./index.css":"../src/index.css"}],"index.css":[function(require,module,exports) {
+
+var reloadCSS = require('_css_loader');
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"assets/images/pexels-photo-210019.jpeg":[function(require,module,exports) {
+module.exports = "/pexels-photo-210019.e707cd14.jpeg";
+},{}],"assets/images/pexels-photo-593172.jpeg":[function(require,module,exports) {
+module.exports = "/pexels-photo-593172.9ce553d6.jpeg";
+},{}],"index.js":[function(require,module,exports) {
 'use strict';
 
-var _jsxFileName = '/Users/xiacan/Documents/web/react-app/xerxes-react-carousel/example/index.js',
-    _this = undefined;
+var _jsxFileName = '/Users/xiacan/Documents/web/react-app/xerxes-react-carousel/example/index.js';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
 
@@ -20802,94 +21334,253 @@ var _src = require('../src');
 
 var _src2 = _interopRequireDefault(_src);
 
+require('./index.css');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var App = function App() {
-  return _react2.default.createElement(
-    'div',
-    {
-      __source: {
-        fileName: _jsxFileName,
-        lineNumber: 6
-      },
-      __self: _this
-    },
-    _react2.default.createElement(
-      'h1',
-      {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 7
-        },
-        __self: _this
-      },
-      'carousel example1'
-    ),
-    _react2.default.createElement(
-      _src2.default,
-      { type: 'card', __source: {
-          fileName: _jsxFileName,
-          lineNumber: 8
-        },
-        __self: _this
-      },
-      _react2.default.createElement(
-        _src2.default.Item,
-        {
-          __source: {
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var list = [{
+  img: require('./assets/images/pexels-photo-210019.jpeg')
+}, {
+  img: require('./assets/images/pexels-photo-593172.jpeg')
+}, {
+  img: require('./assets/images/pexels-photo-210019.jpeg')
+}, {
+  img: require('./assets/images/pexels-photo-593172.jpeg')
+}, {
+  img: require('./assets/images/pexels-photo-210019.jpeg')
+}];
+
+var App = function (_React$Component) {
+  _inherits(App, _React$Component);
+
+  function App() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
+    _classCallCheck(this, App);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = App.__proto__ || Object.getPrototypeOf(App)).call.apply(_ref, [this].concat(args))), _this), Object.defineProperty(_this, 'state', {
+      enumerable: true,
+      writable: true,
+      value: {
+        type: '',
+        checkValue: '1'
+      }
+    }), Object.defineProperty(_this, 'radio1Change', {
+      enumerable: true,
+      writable: true,
+      value: function value(event) {
+        debugger;
+        console.log(event);
+        _this.setState({ checkValue: event.target.value });
+      }
+    }), Object.defineProperty(_this, 'radioChange', {
+      enumerable: true,
+      writable: true,
+      value: function value(event) {
+        console.log(event);
+        _this.setState({ checkValue: event.target.value });
+        _this.refs.root.setActiveItem(1);
+      }
+    }), _temp), _possibleConstructorReturn(_this, _ret);
+  }
+
+  _createClass(App, [{
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var checkValue = this.state.checkValue;
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'demo1', __source: {
             fileName: _jsxFileName,
-            lineNumber: 9
+            lineNumber: 42
           },
-          __self: _this
+          __self: this
         },
         _react2.default.createElement(
           'h1',
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 10
+              lineNumber: 43
             },
-            __self: _this
+            __self: this
           },
-          '11'
-        )
-      ),
-      _react2.default.createElement(
-        _src2.default.Item,
-        {
-          __source: {
-            fileName: _jsxFileName,
-            lineNumber: 12
+          'carousel example1 3D\u6A21\u5F0F'
+        ),
+        _react2.default.createElement(
+          _src2.default,
+          { type: 'card', __source: {
+              fileName: _jsxFileName,
+              lineNumber: 44
+            },
+            __self: this
           },
-          __self: _this
-        },
+          list.map(function (item, index) {
+            return _react2.default.createElement(
+              _src2.default.Item,
+              { key: index, __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 46
+                },
+                __self: _this2
+              },
+              _react2.default.createElement(
+                'div',
+                { style: { height: '100%' }, __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 47
+                  },
+                  __self: _this2
+                },
+                _react2.default.createElement('img', { style: { width: '100%', height: '100%' }, src: item.img, alt: index, __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 48
+                  },
+                  __self: _this2
+                }),
+                _react2.default.createElement(
+                  'h4',
+                  {
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 49
+                    },
+                    __self: _this2
+                  },
+                  index + 1
+                )
+              )
+            );
+          })
+        ),
         _react2.default.createElement(
           'h1',
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 13
+              lineNumber: 54
             },
-            __self: _this
+            __self: this
           },
-          '2222'
+          'carousel example2 \u666E\u901A\u6A21\u5F0F'
+        ),
+        _react2.default.createElement(
+          _src2.default,
+          { type: checkValue === '1' ? null : 'card', ref: 'root', __source: {
+              fileName: _jsxFileName,
+              lineNumber: 55
+            },
+            __self: this
+          },
+          list.map(function (item, index) {
+            return _react2.default.createElement(
+              _src2.default.Item,
+              { key: index, __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 57
+                },
+                __self: _this2
+              },
+              _react2.default.createElement(
+                'div',
+                { className: 'carousel-wrapper', __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 58
+                  },
+                  __self: _this2
+                },
+                _react2.default.createElement('img', { style: { width: '100%', height: '100%' }, src: item.img, alt: index, __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 59
+                  },
+                  __self: _this2
+                }),
+                _react2.default.createElement(
+                  'h4',
+                  {
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 60
+                    },
+                    __self: _this2
+                  },
+                  index + 1
+                )
+              )
+            );
+          })
+        ),
+        _react2.default.createElement(
+          'label',
+          {
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 65
+            },
+            __self: this
+          },
+          _react2.default.createElement('input', { type: 'radio', name: 'type', value: '1', onChange: function onChange(e) {
+              return _this2.radioChange(e);
+            }, checked: checkValue === '1', __source: {
+              fileName: _jsxFileName,
+              lineNumber: 66
+            },
+            __self: this
+          }),
+          ' \u666E\u901A\u7C7B\u578B'
+        ),
+        _react2.default.createElement(
+          'label',
+          {
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 68
+            },
+            __self: this
+          },
+          _react2.default.createElement('input', { type: 'radio', name: 'type', value: '2', onChange: function onChange(e) {
+              return _this2.radioChange(e);
+            }, checked: checkValue === '2', __source: {
+              fileName: _jsxFileName,
+              lineNumber: 69
+            },
+            __self: this
+          }),
+          ' \u5361\u7247\u7C7B\u578B'
         )
-      )
-    )
-  );
-};
+      );
+    }
+  }]);
+
+  return App;
+}(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(App, {
   __source: {
     fileName: _jsxFileName,
-    lineNumber: 20
+    lineNumber: 77
   },
   __self: undefined
 }), document.getElementById('root'));
 if (module.hot) {
   module.hot.accept();
 }
-},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","../src":"../src/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","../src":"../src/index.js","./index.css":"index.css","./assets/images/pexels-photo-210019.jpeg":"assets/images/pexels-photo-210019.jpeg","./assets/images/pexels-photo-593172.jpeg":"assets/images/pexels-photo-593172.jpeg"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -20918,7 +21609,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '64122' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '54350' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
