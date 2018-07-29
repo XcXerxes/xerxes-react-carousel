@@ -17,10 +17,10 @@ npm i xerxes-react-carousel or yarn add xerxes-react-carousel
 
 ### props说明
 
-| left | center | right |
-| :--- | :----: | ----: |
-| aaaa | bbbbbb | ccccc |
-| a    | b      | c     |
+| 属性 | 类型 | 默认值 | 可选值 | 描述 |
+| :--- | :----: | :----: | :---: | :--- |
+| initIndex | Number | ❌  | -- | 初始化时指向的carouselItem 的下标，默认从0开始 |
+
 
 | Attributes | Type | Default | value | Description |
 | :---------- | :--: | :---------: | :------------ |
