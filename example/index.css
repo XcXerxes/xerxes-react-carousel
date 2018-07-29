@@ -1,0 +1,40 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.demo1 {
+  padding: 20px 15%;
+}
+
+.demo1 .xerxes-carousel__item:nth-child(2n+1) {
+  background-color: #d3dce6;
+}
+.demo1 .xerxes-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+.demo1 .xerxes-carousel__item {
+  text-align: center;
+}
+.demo1 .xerxes-carousel__item h1 {
+  line-height: 300px;
+  margin: 0;
+  opacity: .8;
+}
+
+.carousel-wrapper {
+  height: 100%;
+  position: relative;
+}
+.carousel-wrapper>h4 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  color: #fff;
+  font-size: 16px;
+}

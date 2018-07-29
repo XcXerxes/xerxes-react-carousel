@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import {addResizeListener, removeResizeListener} from './utils/resize-event'
 
 class Carousel extends Component {
   state = {
@@ -17,8 +18,60 @@ class Carousel extends Component {
       component: this
     }
   }
-  componentDidUpdate () {
-    console.log('update')
+
+  /**
+   * 
+   * @param {*选择的下标} index 
+   */
+  setActiveItem (index) {
+    debugger
+    let {activeIndex} = this.state
+    index = Number(index)
+
+    if (isNaN(index) || index !== Math.floor(index)) {
+      process.env.NODE_ENV !== 'production' && 
+      console.warn('[Carousel] index must be an int')
+      return
+    }
+    let {length} = this.state.items
+    if (index < 0) {
+      activeIndex = length -1
+    } else if (index >= length) {
+      activeIndex = 0
+    } else {
+      activeIndex = index
+    }
+    this.setState({activeIndex})
+  }
+  componentDidMount () {
+    const {initIndex} = this.props
+    const {items} = this.state
+    if (initIndex < items.length && initIndex >= 0) {
+      this.setState({
+        activeIndex: initIndex
+      })
+    } else {
+      this.setState({activeIndex: 0})
+    }
+  }
+  componentDidUpdate (prevProps, prevState) {
+    addResizeListener(this.refs.root, this.resetItemPosition)
+
+    if (prevState.activeIndex !== this.state.activeIndex) {
+      this.resetItemPosition(prevState.activeIndex)
+      if (this.props.onChange) {
+        this.props.onChange(this.state.activeIndex, prevState.activeIndex)
+      }
+    }
+  }
+  // 充值元素的位置
+  resetItemPosition = (oldIndex) => {
+    this.state.items.forEach((item, index) => {
+      item.translateItem(index, this.state.activeIndex, oldIndex)
+    })
+  }
+  componentWillUnmount () {
+    removeEventListener(this.refs.root, this.resetItemPosition)
   }
   /**
    * 
@@ -61,11 +114,17 @@ class Carousel extends Component {
 
   _handleMouseEnter = () => {
     this.setState({hover: true})
-    this.pauseTimer()
+    // this.pauseTimer()
   }
   _handleMouseLeave = () => {
     this.setState({hover: false})
-    this.startTime()
+    // this.startTime()
+  }
+  next = () => {
+    this.setActiveItem(this.state.activeIndex + 1)
+  }
+  prev = () => {
+    this.setActiveItem(this.state.activeIndex - 1)
   }
   render() {
     const {
@@ -77,7 +136,10 @@ class Carousel extends Component {
       })}
       onMouseEnter={this._handleMouseEnter}
       onMouseLeave={this._handleMouseLeave}
+      ref="root"
       >
+        <div onClick={this.next}>Next</div>
+        <div onClick={this.prev}>Prev</div>
         <div className="xerxes-carousel__container"
           style={{height: `${height}px`}}
         >
