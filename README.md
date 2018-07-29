@@ -20,6 +20,7 @@ npm i xerxes-react-carousel or yarn add xerxes-react-carousel
 | 属性 | 类型 | 默认值 | 可选值 | 描述 |
 | :--- | :----: | :----: | :---: | :--- |
 | initIndex | Number | ❌  | -- | 初始化时指向的carouselItem 的下标，默认从0开始 |
+| autoplay   | Boolean | false  | true or false  | 是否自动播放 |
 
 
 | Attributes | Type | Default | value | Description |
