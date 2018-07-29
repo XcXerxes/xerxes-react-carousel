@@ -7,7 +7,7 @@ const App = () => (
     <h1>carousel example1</h1>
     <Carousel type="card">
       <Carousel.Item>
-        <h1>1111</h1>
+        <h1>11</h1>
       </Carousel.Item>
       <Carousel.Item>
         <h1>2222</h1>
@@ -20,3 +20,6 @@ ReactDOM.render(
   <App />,
   document.getElementById('root')
 )
+if (module.hot) {
+  module.hot.accept()
+}

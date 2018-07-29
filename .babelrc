@@ -1,6 +1,13 @@
 {
   "presets": [
-    "env",
-    "react"
+    "react-app"
+  ],
+  "plugins": [
+    [
+      "transform-class-properties",
+      {
+        "spec": true
+      }
+    ]
   ]
 }

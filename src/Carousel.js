@@ -4,12 +4,36 @@ import classnames from 'classnames'
 
 class Carousel extends Component {
   state = {
+    items: [],
     activeIndex: -1,
     hover: false
   }
   get iscard () {
     const {type} = this.props
     return type === 'card'
+  }
+  getChildContext () {
+    return {
+      component: this
+    }
+  }
+  componentDidUpdate () {
+    console.log('update')
+  }
+  /**
+   * 
+   * @param {*component} item 
+   */
+  addItem(item) {
+    this.state.items.push(item)
+    
+  }
+  /**
+   * @param {*component} item
+   */
+  removeItem(item) {
+    const {items} = this.state
+    items.splice(items.indexOf(item), 1)
   }
 
   // 开始
@@ -44,6 +68,9 @@ class Carousel extends Component {
     this.startTime()
   }
   render() {
+    const {
+      height
+    } = this.props
     return (
       <div className={classnames('xerxes-carousel', {
         'xerxes-carousel__card': this.iscard
@@ -59,6 +86,10 @@ class Carousel extends Component {
       </div>
     )
   }
+}
+
+Carousel.childContextTypes = {
+  component: PropTypes.any
 }
 
 Carousel.propTypes = {
