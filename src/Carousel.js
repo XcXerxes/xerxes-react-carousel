@@ -207,8 +207,10 @@ Carousel.childContextTypes = {
 }
 
 Carousel.propTypes = {
+  initIndex: PropTypes.number,
   type: PropTypes.string,
   height: PropTypes.number,
+  autoplay: PropTypes.bool,
   interval: PropTypes.number,
   arrow: PropTypes.bool,
   indicator: PropTypes.bool,
