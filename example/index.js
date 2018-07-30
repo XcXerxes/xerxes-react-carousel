@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Carousel from '../src'
 import './index.css'
+import XerxesCarousel from 'xerxes-react-carousel'
 
 const list = [
   {
@@ -33,7 +34,6 @@ class App extends React.Component {
   radioChange = (event) => {
     console.log(event)
     this.setState({checkValue: event.target.value})
-    this.refs.root.setActiveItem(1)
   }
   render () {
     const {checkValue} = this.state
@@ -134,6 +134,23 @@ class App extends React.Component {
             </Carousel.Item>
           ))}
         </Carousel>
+        <br />
+        <br />
+        <br />
+        <br />
+        <h1>carousel example7 自定义</h1>
+        <XerxesCarousel
+        height={400}
+        >
+          {list.map((item, index) => (
+            <XerxesCarousel.Item key={index}>
+              <div className="carousel-wrapper">
+                <img style={{ width: '100%', height: '100%' }} src={item.img} alt={index} />
+                <h4>{index + 1}</h4>
+              </div>
+            </XerxesCarousel.Item>
+          ))}
+        </XerxesCarousel>
       </div>
     )
   }

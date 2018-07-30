@@ -6355,6 +6355,35 @@ ws@^5.1.1, ws@^5.2.0:
   dependencies:
     async-limiter "~1.0.0"
 
+xerxes-react-carousel@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/xerxes-react-carousel/-/xerxes-react-carousel-0.0.1.tgz#abf60d41b5fd71d74b9a6f5c7493772e5868986a"
+  dependencies:
+    classnames "^2.2.6"
+    react "^16.4.1"
+    react-dom "^16.4.1"
+    throttle-debounce "^2.0.1"
+
+xerxes-react-carousel@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/xerxes-react-carousel/-/xerxes-react-carousel-0.0.2.tgz#4b40f0b6e36515bff6df8044bc5d6d808821346a"
+  dependencies:
+    classnames "^2.2.6"
+    react "^16.4.1"
+    react-dom "^16.4.1"
+    throttle-debounce "^2.0.1"
+    xerxes-react-carousel "^0.0.1"
+
+xerxes-react-carousel@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/xerxes-react-carousel/-/xerxes-react-carousel-0.0.3.tgz#81c195397809e40915e735328cf7bcd152e82c22"
+  dependencies:
+    classnames "^2.2.6"
+    react "^16.4.1"
+    react-dom "^16.4.1"
+    throttle-debounce "^2.0.1"
+    xerxes-react-carousel "^0.0.2"
+
 xml-name-validator@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"

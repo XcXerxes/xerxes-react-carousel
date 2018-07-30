@@ -69,7 +69,7 @@ class Carousel extends Component {
     }
   }
   componentDidUpdate(prevProps, prevState) {
-    addResizeListener(this.refs.root, this.resetItemPosition)
+    addResizeListener(this.root, this.resetItemPosition)
 
     if (prevState.activeIndex !== this.state.activeIndex) {
       this.resetItemPosition(prevState.activeIndex)
@@ -85,7 +85,7 @@ class Carousel extends Component {
     })
   }
   componentWillUnmount() {
-    removeEventListener(this.refs.root, this.resetItemPosition)
+    removeEventListener(this.root, this.resetItemPosition)
   }
   /**
    * 
@@ -181,7 +181,7 @@ class Carousel extends Component {
       }, className)}
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
-        ref="root"
+        ref={ref => this.root = ref}
         style={style}
       >
         {arrow && <Fragment>

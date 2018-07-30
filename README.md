@@ -26,6 +26,7 @@ npm i xerxes-react-carousel or yarn add xerxes-react-carousel
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Carousel from 'xerxes-react-carousel'
+import 'xerxes-react-carousel/lib/index.css'
 
 const list = [
   {

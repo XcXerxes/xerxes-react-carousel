@@ -1,8 +1,8 @@
 {
   "name": "xerxes-react-carousel",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "react carousel 3d",
-  "main": "./src/index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "jest --watch",
     "start": "cross-env NODE_ENV=development parcel ./example/index.html --open",
@@ -42,7 +42,8 @@
     "classnames": "^2.2.6",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "throttle-debounce": "^2.0.1"
+    "throttle-debounce": "^2.0.1",
+    "xerxes-react-carousel": "^0.0.3"
   },
   "browserslist": [
     "last 1 version",
