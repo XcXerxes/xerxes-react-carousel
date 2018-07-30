@@ -21,6 +21,7 @@ npm i xerxes-react-carousel or yarn add xerxes-react-carousel
 ### 如何使用
 
 `
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Carousel from 'xerxes-react-carousel'
