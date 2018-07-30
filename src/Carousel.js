@@ -53,14 +53,19 @@ class Carousel extends Component {
     this.setState({ activeIndex })
   }
   componentDidMount() {
-    const { initIndex } = this.props
+    const { initIndex, autoplay } = this.props
     const { items } = this.state
     if (initIndex < items.length && initIndex >= 0) {
       this.setState({
         activeIndex: initIndex
       })
     } else {
-      this.setState({ activeIndex: 0 })
+      this.setState({
+        activeIndex: 0
+      })
+    }
+    if (autoplay) {
+      this.startTime()
     }
   }
   componentDidUpdate(prevProps, prevState) {
@@ -102,7 +107,7 @@ class Carousel extends Component {
   startTime = () => {
     const { interval, autoplay } = this.props
     if (interval <= 0 || !autoplay) return
-    this.timer = setInterval(this.playSlides(Number(interval)))
+    this.timer = setInterval(this.playSlides, Number(interval))
   }
 
   // 切换更改index
@@ -118,16 +123,15 @@ class Carousel extends Component {
   // 暂停
   pauseTimer = () => {
     clearInterval(this.timer)
-    this.timer = null
   }
 
   _handleMouseEnter = () => {
     this.setState({ hover: true })
-    // this.pauseTimer()
+    this.pauseTimer()
   }
   _handleMouseLeave = () => {
     this.setState({ hover: false })
-    // this.startTime()
+    this.startTime()
   }
   next = () => {
     this.throttleArrowClick(this.state.activeIndex + 1)
@@ -171,7 +175,6 @@ class Carousel extends Component {
       arrowClassName
     } = this.props
     const {items} = this.state
-    console.log('indicator', indicator)
     return (
       <div className={classnames('xerxes-carousel', {
         'xerxes-carousel__card': this.iscard

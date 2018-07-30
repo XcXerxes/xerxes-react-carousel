@@ -88,9 +88,6 @@ class CarouselItem extends Component {
       this.state.inStage = Math.round(Math.abs(index - activeIndex)) <= 1
       this.state.active = index === activeIndex
       this.state.translate = this.calculateTranslate(index, activeIndex, parentWidth)
-      console.log('translate ===================')
-      console.log(this.state.translate)
-      console.log('translate ===================')
       this.state.scale = this.state.active ? 1 : this.CARD_SCALE
     } else {
       this.state.active = index === activeIndex

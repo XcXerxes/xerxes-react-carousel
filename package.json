@@ -4,8 +4,8 @@
   "description": "react carousel 3d",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "npm test",
-    "start": "cross-env NODE_ENV=development parcel ./example/index.html",
+    "test": "jest --watch",
+    "start": "cross-env NODE_ENV=development parcel ./example/index.html --open",
     "build": "cross-env NODE_ENV=production parcel build ./src/index.js --no-minify --out-dir ./lib"
   },
   "repository": {
@@ -27,9 +27,13 @@
   "devDependencies": {
     "autoprefixer": "^9.0.1",
     "babel-core": "^6.26.3",
+    "babel-jest": "^23.4.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-react-app": "^3.1.2",
     "cross-env": "^5.2.0",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "jest": "^23.4.2",
     "parcel-bundler": "^1.9.7",
     "postcss-modules": "^1.3.2",
     "prop-types": "^15.6.2"
@@ -44,5 +48,13 @@
     "last 1 version",
     "> 1%",
     "IE 10"
-  ]
+  ],
+  "jest": {
+    "setupTestFrameworkScriptFile": "./jest/setupTests.js",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js|jsx|mjs)$": "./node_modules/babel-jest",
+      "^.+\\.css$": "./jest/cssTransform.js"
+    }
+  }
 }

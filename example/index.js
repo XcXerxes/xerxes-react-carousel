@@ -50,7 +50,44 @@ class App extends React.Component {
             </Carousel.Item>
           ))}
         </Carousel>
+        <br />
+        <br />
+        <br />
+        <br />
         <h1>carousel example2 普通模式</h1>
+        <Carousel type={checkValue === '1' ? null : 'card'} 
+        ref="root">
+          {list.map((item, index) => (
+            <Carousel.Item key={index}>
+              <div className="carousel-wrapper">
+                <img style={{ width: '100%', height: '100%' }} src={item.img} alt={index} />
+                <h4>{index + 1}</h4>
+              </div>
+            </Carousel.Item>
+          ))}
+        </Carousel>
+        <br />
+        <br />
+        <br />
+        <br />
+        <h1>carousel example3 自动播放</h1>
+        <Carousel type={checkValue === '1' ? null : 'card'} 
+        autoplay={true}
+        ref="root">
+          {list.map((item, index) => (
+            <Carousel.Item key={index}>
+              <div className="carousel-wrapper">
+                <img style={{ width: '100%', height: '100%' }} src={item.img} alt={index} />
+                <h4>{index + 1}</h4>
+              </div>
+            </Carousel.Item>
+          ))}
+        </Carousel>
+        <br />
+        <br />
+        <br />
+        <br />
+        <h1>carousel example4 指示器 outside</h1>
         <Carousel type={checkValue === '1' ? null : 'card'} 
         indicatorPosition="outside"
         ref="root">
@@ -63,12 +100,40 @@ class App extends React.Component {
             </Carousel.Item>
           ))}
         </Carousel>
-        <label>
-        <input type="radio" name="type" value="1" onChange={(e) => this.radioChange(e)} checked={checkValue === '1'} /> 普通类型
-        </label>
-        <label>
-        <input type="radio" name="type" value="2" onChange={(e) => this.radioChange(e)} checked={checkValue === '2'} /> 卡片类型
-        </label>
+        <br />
+        <br />
+        <br />
+        <br />
+        <h1>carousel example5 隐藏指示器</h1>
+        <Carousel type={checkValue === '1' ? null : 'card'} 
+        indicator={false}
+        ref="root">
+          {list.map((item, index) => (
+            <Carousel.Item key={index}>
+              <div className="carousel-wrapper">
+                <img style={{ width: '100%', height: '100%' }} src={item.img} alt={index} />
+                <h4>{index + 1}</h4>
+              </div>
+            </Carousel.Item>
+          ))}
+        </Carousel>
+        <br />
+        <br />
+        <br />
+        <br />
+        <h1>carousel example6 设置高度</h1>
+        <Carousel type={checkValue === '1' ? null : 'card'} 
+        height={500}
+        ref="root">
+          {list.map((item, index) => (
+            <Carousel.Item key={index}>
+              <div className="carousel-wrapper">
+                <img style={{ width: '100%', height: '100%' }} src={item.img} alt={index} />
+                <h4>{index + 1}</h4>
+              </div>
+            </Carousel.Item>
+          ))}
+        </Carousel>
       </div>
     )
   }
