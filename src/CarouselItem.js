@@ -67,7 +67,6 @@ class CarouselItem extends Component {
    * @param {*上一个component} oldIndex 
    */
   translateItem(index, activeIndex, oldIndex) {
-    debugger
     const {component} = this.context
     // 获取父元素的dom节点
     const parent = ReactDOM.findDOMNode(this.context.component)

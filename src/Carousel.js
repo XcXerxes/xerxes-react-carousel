@@ -34,7 +34,6 @@ class Carousel extends Component {
    * @param {*选择的下标} index 
    */
   setActiveItem(index) {
-    debugger
     let { activeIndex } = this.state
     index = Number(index)
 
@@ -147,9 +146,12 @@ class Carousel extends Component {
    * @param {*轮播的数量} items
    */
   renderIndicatorItem = (items) => {
-    const {indicatorPosition} = this.props
+    const {indicatorPosition, indicatorClassName} = this.props
     const indicators = items.map((item, index) => (
-      <Indicator key={index} indicatorClick={() => this.indicatorClick(index)} className={classnames({'active': this.state.activeIndex === index})} />
+      <Indicator key={index} 
+      indicatorClick={() => this.indicatorClick(index)} className={classnames({'active': this.state.activeIndex === index})}
+      
+      />
     ))
     return (
       <ul className={classnames('xerxes-indicator__wrapper', {
@@ -207,8 +209,8 @@ Carousel.propTypes = {
   interval: PropTypes.number,
   arrow: PropTypes.bool,
   indicator: PropTypes.bool,
-  indicatorPosition: PropTypes.string
-
+  indicatorPosition: PropTypes.string,
+  indicatorClassName: PropTypes.string,
 }
 
 /**

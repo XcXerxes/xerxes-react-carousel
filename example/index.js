@@ -27,7 +27,6 @@ class App extends React.Component {
     checkValue: '1'
   }
   radio1Change = (event) => {
-    debugger
     console.log(event)
     this.setState({checkValue: event.target.value})
   }
