@@ -4,6 +4,7 @@
   * [安装说明](#安装说明)
   * [如何使用](#如何使用)
   * [props说明](#props说明)
+  * [events说明](#events说明)
   * [methods说明](#methods说明)
 
 ## 基本介绍
@@ -76,6 +77,17 @@ ReactDOM.render(<App />, document.getElementById('root'))
 | indicatorPosition | String | ❌ | outside or none | 指示器的位置
 | indicatorClassName | String | ❌ | --- | 指示器的类名 |
 
+### events说明
+
+| 事件名称 | 回调参数 | 事件说明 |
+| :------ | :------:| :------ |
+| onChange | 当前激活的索引, 上一个的索引
 
 ### methods说明
+| 方法名称 | 方法说明 |
+| :------ | :------- |
+| prev | 切换到上一个索引 |
+| next | 切换到下一个索引 |
+
+
 
