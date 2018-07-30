@@ -1,0 +1,30 @@
+.arrow-wrapper {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  z-index: 50;
+  transition: all .4s ease;
+}
+.arrow-wrapper.left {
+  left: 0;
+}
+.arrow-wrapper.right {
+  right: 0;
+}
+.arrow-wrapper>i {
+  font-size: 32px;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #606060;
+  transition: all .4s ease;
+}
+.arrow-wrapper:hover {
+  background-color: rgba(255, 255, 255, .2);
+}
+.arrow-wrapper:hover>i {
+  color: #373737;
+}

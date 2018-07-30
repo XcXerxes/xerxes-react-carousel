@@ -52,7 +52,9 @@ class App extends React.Component {
           ))}
         </Carousel>
         <h1>carousel example2 普通模式</h1>
-        <Carousel type={checkValue === '1' ? null : 'card'} ref="root">
+        <Carousel type={checkValue === '1' ? null : 'card'} 
+        indicatorPosition="outside"
+        ref="root">
           {list.map((item, index) => (
             <Carousel.Item key={index}>
               <div className="carousel-wrapper">

@@ -1,11 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import {throttle} from 'throttle-debounce'
-import {addResizeListener, removeResizeListener} from './utils/resize-event'
+import { throttle } from 'throttle-debounce'
+import { addResizeListener, removeResizeListener } from './utils/resize-event'
+import ButtonArrow from './Button-arrow'
+import Indicator from './Indicator'
 
 class Carousel extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -17,11 +19,11 @@ class Carousel extends Component {
       this.setActiveItem(index)
     })
   }
-  get iscard () {
-    const {type} = this.props
+  get iscard() {
+    const { type } = this.props
     return type === 'card'
   }
-  getChildContext () {
+  getChildContext() {
     return {
       component: this
     }
@@ -31,38 +33,38 @@ class Carousel extends Component {
    * 
    * @param {*选择的下标} index 
    */
-  setActiveItem (index) {
+  setActiveItem(index) {
     debugger
-    let {activeIndex} = this.state
+    let { activeIndex } = this.state
     index = Number(index)
 
     if (isNaN(index) || index !== Math.floor(index)) {
-      process.env.NODE_ENV !== 'production' && 
-      console.warn('[Carousel] index must be an int')
+      process.env.NODE_ENV !== 'production' &&
+        console.warn('[Carousel] index must be an int')
       return
     }
-    let {length} = this.state.items
+    let { length } = this.state.items
     if (index < 0) {
-      activeIndex = length -1
+      activeIndex = length - 1
     } else if (index >= length) {
       activeIndex = 0
     } else {
       activeIndex = index
     }
-    this.setState({activeIndex})
+    this.setState({ activeIndex })
   }
-  componentDidMount () {
-    const {initIndex} = this.props
-    const {items} = this.state
+  componentDidMount() {
+    const { initIndex } = this.props
+    const { items } = this.state
     if (initIndex < items.length && initIndex >= 0) {
       this.setState({
         activeIndex: initIndex
       })
     } else {
-      this.setState({activeIndex: 0})
+      this.setState({ activeIndex: 0 })
     }
   }
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     addResizeListener(this.refs.root, this.resetItemPosition)
 
     if (prevState.activeIndex !== this.state.activeIndex) {
@@ -78,7 +80,7 @@ class Carousel extends Component {
       item.translateItem(index, this.state.activeIndex, oldIndex)
     })
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     removeEventListener(this.refs.root, this.resetItemPosition)
   }
   /**
@@ -87,32 +89,32 @@ class Carousel extends Component {
    */
   addItem(item) {
     this.state.items.push(item)
-    
+
   }
   /**
    * @param {*component} item
    */
   removeItem(item) {
-    const {items} = this.state
+    const { items } = this.state
     items.splice(items.indexOf(item), 1)
   }
 
   // 开始
   startTime = () => {
-    const {interval, autoplay} = this.props
+    const { interval, autoplay } = this.props
     if (interval <= 0 || !autoplay) return
     this.timer = setInterval(this.playSlides(Number(interval)))
   }
 
   // 切换更改index
   playSlides = () => {
-    let {activeIndex, items} = this.state
-    if (activeIndex < items.length -1) {
-      activeIndex ++
+    let { activeIndex, items } = this.state
+    if (activeIndex < items.length - 1) {
+      activeIndex++
     } else {
       activeIndex = 0
     }
-    this.setState({activeIndex})
+    this.setState({ activeIndex })
   }
   // 暂停
   pauseTimer = () => {
@@ -121,11 +123,11 @@ class Carousel extends Component {
   }
 
   _handleMouseEnter = () => {
-    this.setState({hover: true})
+    this.setState({ hover: true })
     // this.pauseTimer()
   }
   _handleMouseLeave = () => {
-    this.setState({hover: false})
+    this.setState({ hover: false })
     // this.startTime()
   }
   next = () => {
@@ -134,25 +136,62 @@ class Carousel extends Component {
   prev = () => {
     this.throttleArrowClick(this.state.activeIndex - 1)
   }
+  
+  /**
+   * @param {*当前选中的指示器下标} index
+   */
+  indicatorClick = (index) => {
+    this.throttleArrowClick(index)
+  }
+  /**
+   * @param {*轮播的数量} items
+   */
+  renderIndicatorItem = (items) => {
+    const {indicatorPosition} = this.props
+    const indicators = items.map((item, index) => (
+      <Indicator key={index} indicatorClick={() => this.indicatorClick(index)} className={classnames({'active': this.state.activeIndex === index})} />
+    ))
+    return (
+      <ul className={classnames('xerxes-indicator__wrapper', {
+        'outside': indicatorPosition === 'outside'
+      })}>
+        {indicators}
+      </ul>
+    )
+  }
   render() {
     const {
-      height
+      height,
+      arrow,
+      indicator,
+      className,
+      style,
+      arrowClassName
     } = this.props
+    const {items} = this.state
+    console.log('indicator', indicator)
     return (
       <div className={classnames('xerxes-carousel', {
         'xerxes-carousel__card': this.iscard
-      })}
-      onMouseEnter={this._handleMouseEnter}
-      onMouseLeave={this._handleMouseLeave}
-      ref="root"
+      }, className)}
+        onMouseEnter={this._handleMouseEnter}
+        onMouseLeave={this._handleMouseLeave}
+        ref="root"
+        style={style}
       >
-        <div onClick={this.next}>Next</div>
-        <div onClick={this.prev}>Prev</div>
+        {arrow && <Fragment>
+          <ButtonArrow position="right" arrowClick={this.next} 
+          arrowClassName={arrowClassName}
+          />
+          <ButtonArrow position="left" arrowClick={this.prev} />
+        </Fragment>
+        }
         <div className="xerxes-carousel__container"
-          style={{height: `${height}px`}}
+          style={{ height: `${height}px` }}
         >
-        {this.props.children}
+          {this.props.children}
         </div>
+        {indicator && this.renderIndicatorItem(items)}
       </div>
     )
   }
@@ -165,7 +204,11 @@ Carousel.childContextTypes = {
 Carousel.propTypes = {
   type: PropTypes.string,
   height: PropTypes.number,
-  interval: PropTypes.number
+  interval: PropTypes.number,
+  arrow: PropTypes.bool,
+  indicator: PropTypes.bool,
+  indicatorPosition: PropTypes.string
+
 }
 
 /**
@@ -177,7 +220,9 @@ Carousel.propTypes = {
 
 Carousel.defaultProps = {
   autoplay: false,
-  interval: 3000
+  interval: 3000,
+  arrow: true,
+  indicator: true
 }
 
 export default Carousel
