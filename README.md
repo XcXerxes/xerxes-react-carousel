@@ -13,14 +13,14 @@
 
 使用 `npm` 或者 `yarn` 进行安装
 
-`
+```
 npm i xerxes-react-carousel or yarn add xerxes-react-carousel
 
-`
+```
 
 ### 如何使用
 
-`
+```
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -60,7 +60,7 @@ const App = () => (
 ReactDOM.render(<App />, document.getElementById('root'))
 
 
-`
+```
 
 ### props说明
 
