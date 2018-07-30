@@ -2,6 +2,7 @@
 
 * [基本介绍](#基本介绍)
   * [安装说明](#安装说明)
+  * [如何使用](#如何使用)
   * [props说明](#props说明)
   * [methods说明](#methods说明)
 
@@ -14,6 +15,50 @@
 
 `
 npm i xerxes-react-carousel or yarn add xerxes-react-carousel
+
+`
+
+### 如何使用
+
+`
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Carousel from 'xerxes-react-carousel'
+
+const list = [
+  {
+    img: require('./assets/images/pexels-photo-210019.jpeg')
+  },
+  {
+    img: require('./assets/images/pexels-photo-593172.jpeg')
+  },
+  {
+    img: require('./assets/images/pexels-photo-210019.jpeg')
+  },
+  {
+    img: require('./assets/images/pexels-photo-593172.jpeg')
+  },
+  {
+    img: require('./assets/images/pexels-photo-210019.jpeg')
+  },
+]
+
+const App = () => (
+  <Carousel type="card">
+    {list.map((item, index) => (
+      <Carousel.Item key={index}>
+        <div style={{ height: '100%' }}>
+          <img style={{ width: '100%', height: '100%' }} src={item.img} alt={index} />
+          <h4>{index + 1}</h4>
+        </div>
+      </Carousel.Item>
+    ))}
+  </Carousel>
+)
+
+ReactDOM.render(<App />, document.getElementById('root'))
+
+
 `
 
 ### props说明
