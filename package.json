@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --watch",
     "start": "cross-env NODE_ENV=development parcel ./example/index.html --open",
-    "build": "cross-env NODE_ENV=production parcel build ./src/index.js --no-minify --out-dir ./lib"
+    "build": "cross-env NODE_ENV=production parcel build ./src/index.js --no-source-maps --out-dir ./lib"
   },
   "repository": {
     "type": "git",
