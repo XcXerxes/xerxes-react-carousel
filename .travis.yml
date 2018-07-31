@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- '7'
+script: npm test
+deploy:
+  provider: releases
+  api_key:
+    secure: J7Ote1VbItN/+08uqcU5o0jA8fvhsuz7stlNVSiIsd0BICwyUtg4OFuCRunyYW5fBWbkYWSquQyf1PuiYeEwwdgtUQvpD1j8RspKyzNgRkemaVGN9J7qkd7w+dhv5R0qpjYwsL3QSDlhSO5OrpDWbIWQCWQeAdMB2IDvrKvJIgNYX/LadNrP/R4nVXjZ777eyKQGtUJ5XB0mN8gMcaY9kpYXoscsnP2VKLQT1DrXanAoBEmewB4izzem7qQ1H0ptthah0pOcmofKi7rFRtLumIEtIqpaMUIp7QmEqSRmE07vilngnoxp9gNL0FYWeS9St9U+mSCy8nfm/FVP4aGHKjsoXtH9wo8CMo8WbJwAg0++E0LLDvPaoTmtrLlcHR7Iw6tAzDmm/MnaO9a+MxacqUxuU07sxu0nIHkhUQcWaZnpnIQ2LDNsUsk37gMT/ykSFHTa2ZCbYU3q3qSlMx9PSHIR/TARpbqpQu2dtKSIm0v+SpP6u3J1OWcrpEBGBbA6MuRCu67cKDQ0R/bEXUXeHIT1yjWtbPlaQv9ukltP9JlzLQeurlQL+UztcRsm/N1ypC/OzmyLdZZgsgz+f1zbvAU2P/NLL9hSas/vYH4bM3DAyE18Gs3C+8r/5UMmd3wxD+sbjYYa+Fu7/DVp/eB53NH4XOHruIlhAu80c5oQuAk=
+  file: ''
+  on:
+    repo: XcXerxes/xerxes-react-carousel
