@@ -78,7 +78,7 @@ class Carousel extends Component {
       }
     }
   }
-  // 充值元素的位置
+  // 重置元素的位置
   resetItemPosition = (oldIndex) => {
     this.state.items.forEach((item, index) => {
       item.translateItem(index, this.state.activeIndex, oldIndex)
