@@ -1,4 +1,8 @@
-## xerxes-carsoule
+## xerxes-react-carousel
+
+[![NPM version](https://img.shields.io/npm/v/xerxes-react-carousel.svg)](https://www.npmjs.com/package/xerxes-react-carousel.svg)
+[![Build Status](https://travis-ci.org/XcXerxes/xerxes-react-carousel.svg)](https://travis-ci.org/XcXerxes/xerxes-react-carousel.svg)
+![npm](https://img.shields.io/npm/l/xerxes-react-carousel.svg)
 
 * [基本介绍](#基本介绍)
   * [安装说明](#安装说明)
