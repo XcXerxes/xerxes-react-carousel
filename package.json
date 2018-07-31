@@ -1,6 +1,6 @@
 {
   "name": "xerxes-react-carousel",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "react carousel 3d",
   "main": "./lib/index.js",
   "scripts": {
